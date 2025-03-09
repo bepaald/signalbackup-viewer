@@ -1,0 +1,8 @@
+#include "threadsqlmodel.h"
+
+#include <QPainter>
+#include <QSqlError>
+
+#include "../shared/msgtypes/msgtypes.h"
+#include "../recipientpreferences/recipientpreferences.h"
+#include "../shared/avatarframe/avatarframe.h"

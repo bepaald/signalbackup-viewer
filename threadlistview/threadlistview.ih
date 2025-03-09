@@ -1,0 +1,4 @@
+#include "threadlistview.h"
+
+#include <QPainter>
+#include <QMouseEvent>

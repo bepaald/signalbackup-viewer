@@ -1,0 +1,8 @@
+#include "conversationsqlmodel.h"
+
+#include <QBuffer>
+#include <QPersistentModelIndex>
+#include <QRegularExpression>
+
+#include "../shared/msgtypes/msgtypes.h"
+#include "../mediapreviewgenerator/mediapreviewgenerator.h"

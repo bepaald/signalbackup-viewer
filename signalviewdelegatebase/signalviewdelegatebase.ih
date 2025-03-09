@@ -1,0 +1,6 @@
+#include "signalviewdelegatebase.h"
+
+#include <QPainterPath>
+#include <QPixmap>
+
+#include "../recipientpreferences/recipientpreferences.h"

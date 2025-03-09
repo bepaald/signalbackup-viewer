@@ -1,0 +1,8 @@
+#include "recipientpreferences.h"
+
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QSqlRecord>
+#include <QPainter>
+
+#include "shared/framewithattachment/framewithattachment.h"

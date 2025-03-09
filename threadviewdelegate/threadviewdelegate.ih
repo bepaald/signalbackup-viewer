@@ -1,0 +1,10 @@
+#include "threadviewdelegate.h"
+
+#include <QPainterPath>
+#include <QTextDocument>
+#include <QAbstractTextDocumentLayout>
+
+#include "../common_fe.h"
+#include "../shared/msgtypes/msgtypes.h"
+
+#include "../threadsqlmodel/threadsqlmodel.h"

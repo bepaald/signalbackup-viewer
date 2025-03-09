@@ -1,0 +1,9 @@
+#include "conversationlistviewdelegate.h"
+
+#include <QPainterPath>
+
+#include "../common_fe.h"
+#include "../recipientpreferences/recipientpreferences.h"
+#include "../shared/msgtypes/msgtypes.h"
+
+#include "../shared/protobufparser/protobufparser.h"

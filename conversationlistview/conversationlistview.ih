@@ -1,0 +1,6 @@
+#include "conversationlistview.h"
+
+#include <QPainter>
+#include <QMouseEvent>
+
+#include "../mediaplayer/mediaplayer.h"

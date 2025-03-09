@@ -1,0 +1,7 @@
+#include "messagedetailswidget.h"
+
+#include <QGridLayout>
+#include <QLabel>
+#include <QVariant>
+#include <QVector>
+#include <QString>

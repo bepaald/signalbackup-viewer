@@ -1,0 +1,9 @@
+#include "searchwidget.h"
+
+#include <QLineEdit>
+#include <QPushButton>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QWidget>
+#include <QLabel>
+#include <QCheckBox>
