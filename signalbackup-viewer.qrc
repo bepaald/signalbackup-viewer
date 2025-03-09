@@ -1,0 +1,17 @@
+<RCC>
+  <qresource prefix="/">
+    <file alias="call_made">resources/ic_call_made_grey600_24dp.png</file>
+    <file alias="call_received">resources/ic_call_received_grey600_24dp.png</file>
+    <file alias="received">resources/ic_done_all_white_18dp.png</file>
+    <file alias="joined">resources/ic_favorite_grey600_24dp.png</file>
+    <file alias="pause">resources/ic_pause_circle_fill_white_48dp.png</file>
+    <file alias="security">resources/ic_security_white_24dp.png</file>
+    <file alias="call_missed">resources/ic_call_missed_grey600_24dp.png</file>
+    <file alias="document">resources/ic_document_large_light.png</file>
+    <file alias="sent">resources/ic_done_white_18dp.png</file>
+    <file alias="group">resources/ic_group_white_24dp.png</file>
+    <file alias="play">resources/ic_play_circle_fill_white_48dp.png</file>
+    <file alias="update_group">resources/ic_update_group_role_16.svg</file>
+  </qresource>
+</RCC>
+

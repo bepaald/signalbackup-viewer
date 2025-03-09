@@ -1,10 +1,8 @@
 *
 !README.md
 !LICENSE
-!BUILDSCRIPT.sh
-!BUILDSCRIPT.bash
-!CMakeLists.txt
-!signalbackup-tools.rb
+!signalbackup-viewer.pro
+!signalbackup-viewer.qrc
 !*.cc
 !*.h
 !*.ih
@@ -12,7 +10,10 @@
 !*/*.cc
 !*/*.h
 !*/*.ih
-tests
+!shared/*/*.cc
+!shared/*/*.h
+!shared/*/*.ih
+!resources/*
 !.github/*
 !.github/workflows/*.yml
 !.gitignore
