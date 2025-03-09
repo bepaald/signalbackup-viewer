@@ -91,8 +91,8 @@ void RecipientPreferences::loadData()
     QString id = s_databaseversion >= 24 ? recipientsquery.value("_id").toString() : recipientsquery.value("recipient_ids").toString();
     QString name = "";
     QPixmap avatar;
-    QColor color(Qt::black);
-    QColor darkcolor(Qt::black);
+    QColor color("#315FF4");
+    QColor darkcolor("#315FF4");
     bool isgroup = false;
 
     QString groupid = s_databaseversion >= 24 ? recipientsquery.value("recipient.group_id").toString() : recipientsquery.value("groups.group_id").toString();

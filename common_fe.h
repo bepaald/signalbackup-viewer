@@ -215,7 +215,7 @@ inline QString bepaald::getColorByName(QString const &colorname, bool dark)
   for (uint i = 0; i < color_palette_names.size(); ++i)
     if (color_palette_names[i] == colorname.toStdString())
       return dark ? color_palette_dark[i] : color_palette[i];
-  return "#000000";
+  return "#315FF4";
 }
 
 #endif

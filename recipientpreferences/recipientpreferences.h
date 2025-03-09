@@ -78,14 +78,14 @@ inline QString RecipientPreferences::getColor(QString const &id)
 {
   if (!s_loaded)
     loadData();
-  return s_recipientprefs.value(id, {id, "#888888"})[1].toString();
+  return s_recipientprefs.value(id, {id, "#315FF4"})[1].toString();
 }
 
 inline QString RecipientPreferences::getDarkColor(QString const &id)
 {
   if (!s_loaded)
     loadData();
-  return s_recipientprefs.value(id, {id, "#888888", "#888888"})[2].toString();
+  return s_recipientprefs.value(id, {id, "#315FF4", "#315FF4"})[2].toString();
 }
 
 inline bool RecipientPreferences::isGroup(QString const &id)

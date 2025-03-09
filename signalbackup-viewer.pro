@@ -43,7 +43,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 DEFINES *= QT_USE_QSTRINGBUILDER
 
-LIBS += -lcrypto -lvlc -lsqlite3
+LIBS += -lcrypto -lvlc
 QT += widgets sql
 CONFIG += qt thread object_parallel_to_source c++26
 OBJECTS_DIR=GENERATEDOBJECTS
