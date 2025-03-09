@@ -4,9 +4,9 @@
 
 A simple GUI viewer for Signal Android backup files. I wrote this a long time ago, when backup files first appeared for Signal. When more and more often people needed help modifying their backups (mostly fixing them), I added backup-writing functions to the SignalBackup-class and released [signalbackup-tools](https://github.com/bepaald/signalbackup-tools). That program has now been around for years, has grown immensely and is actively maintained. This program is _not_ actively maintained.
 
-The code dumped here is provided as-is. It was quickly updated to support current backups, and redo the emoji-stuff. Other than that it is pretty much untouched as I left it 6 years ago. I was (and still am) unfamiliar with QT at the time, and was learning about SQL as I went along. I'd say the code quality is not great. Especially the paint() and sizeHint() methods are very complicated and could use thorough refactoring.
+The code dumped here is provided as-is. It was quickly updated to support current backups, and redo the emoji-stuff. Other than that it is pretty much untouched as I left it 6 years ago. I was (and still am) unfamiliar with QT at the time, and was learning about SQL as I went along. I'd say the code quality is not great. Especially the `paint()` and `sizeHint()` methods are very complicated and could use thorough refactoring.
 
-#Compiling
+# Compiling
 
 First, install dependencies ('devel' packages if your distribution provides them separately):
  - Qt6 (QtWidget, QtSql)
@@ -22,14 +22,14 @@ $ make -j
 
 I can imagine the `qmake6` command might exist under different names on other systems.
 
-#Running
+# Running
 
 ```Shell
 $ signalbackup-viewer [backup-file] [passphrase]
 ```
 The look is based on the way Signal looked back then. This means speech bubbles with a little point on them, and the color on the side of the chat partner. Ctrl-F should open a search bar at the bottom. Double clicking on a message shows some info in the terminal (which was originally meant to open a sidebar with that info + save-options for media).
 
-
+![sbv-ss](https://github.com/user-attachments/assets/e90e5805-0684-43b2-a424-5424c0531a9d)
 
 There is a long list of features this viewer does not yet support. Many of them simply did not exist when I last touched this code.
 - I was apparently midway implementing quotes, when I stopped working on this: they half-appear.
@@ -39,7 +39,7 @@ There is a long list of features this viewer does not yet support. Many of them 
 - Expect a _lot_ of debugging messages output to terminal while running.
 - many, _many_ more....
 
-#Future
+# Future
 
 In the short term, nothing much will happen here, although I will probably implement a few simple features (finishing quotes and implementing mentions and text styling might not be too difficult) when I'm bored and have nothing else to do.
 
