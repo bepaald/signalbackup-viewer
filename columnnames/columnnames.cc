@@ -24,18 +24,18 @@
 
 void ColumnNames::init() // static
 {
-  QStringList tables = QSqlDatabase::database().tables();
+  d_tables = QSqlDatabase::database().tables();
 
   // started at dbv 215
   d_part_table = "attachment";
-  if (tables.contains("part") &&
-      !tables.contains("attachment"))
+  if (d_tables.contains("part") &&
+      !d_tables.contains("attachment"))
     d_part_table = "part";
 
   // started at dbv 174
   d_mms_table = "message";
-  if (tables.contains("mms") &&
-      !tables.contains("message"))
+  if (d_tables.contains("mms") &&
+      !d_tables.contains("message"))
     d_mms_table = "mms";
 
   d_recipient_record = QSqlDatabase::database().driver()->record("recipient");

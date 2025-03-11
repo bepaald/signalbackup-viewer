@@ -20,11 +20,14 @@
 #ifndef COLUMNNAMES_H_
 #define COLUMNNAMES_H_
 
+#include <QStringList>
 #include <QSqlRecord>
 #include <QString>
 
 struct ColumnNames
 {
+  static QStringList d_tables;
+
   static QSqlRecord d_recipient_record;
   static QSqlRecord d_sms_record;
   static QSqlRecord d_message_record;

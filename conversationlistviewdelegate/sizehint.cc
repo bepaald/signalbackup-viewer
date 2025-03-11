@@ -93,7 +93,7 @@ QSize ConversationListViewDelegate::sizeHint(QStyleOptionViewItem const &option,
   bodydoc.setDefaultFont(d_bodyfont);
   bodydoc.setDefaultStyleSheet(".emoji {font-size: " + QString::number(QFontMetrics(d_bodyfont).height() + 4) + "px; font-family: emoji;} .jumbo-emoji {font-size: " + QString::number((QFontMetrics(d_bodyfont).height() + 4) * 3) + "px; font-family: emoji;} .monospace {font-family: 'Roboto Mono';}");
   QString bodytext(message_deleted ? (outgoing ? "You deleted this message." : "This message was deleted.") : index.data(Qt::DisplayRole).toString());
-  bodydoc.setHtml(bodytext.toStdString(), index.data(bepaald::MsgRangesRole).toByteArray());
+  bodydoc.setHtml(bodytext.toStdString(), index.data(bepaald::MsgRangesRole).toByteArray(), index.data(bepaald::MentionRole));
 
   QFontMetrics fm(d_footerfont);
   qreal pixelsHigh = fm.height();

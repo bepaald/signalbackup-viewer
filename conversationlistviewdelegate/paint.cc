@@ -187,7 +187,7 @@ void ConversationListViewDelegate::paint(QPainter *painter, QStyleOptionViewItem
   bodydoc.setDefaultFont(d_bodyfont);
   bodydoc.setDefaultStyleSheet(".emoji {font-size: " + QString::number(QFontMetrics(d_bodyfont).height() + 4) + "px; font-family: emoji;} .jumbo-emoji {font-size: " + QString::number((QFontMetrics(d_bodyfont).height() + 4) * 3) + "px; font-family: emoji;} .monospace {font-family: 'Roboto Mono';}");
   QString bodytext(message_deleted ? (outgoing ? "You deleted this message." : "This message was deleted.") : index.data(Qt::DisplayRole).toString());
-  bodydoc.setHtml(bodytext.toStdString(), index.data(bepaald::MsgRangesRole).toByteArray());
+  bodydoc.setHtml(bodytext.toStdString(), index.data(bepaald::MsgRangesRole).toByteArray(), index.data(bepaald::MentionRole));
 
   qreal contentswidth = option.rect.width() * d_widthfraction - d_horizontalmargin - d_pointerwidth - d_leftpadding - d_rightpadding;
   if (!outgoing && index.data(bepaald::IsGroupThreadRole).toBool())
@@ -582,7 +582,7 @@ void ConversationListViewDelegate::paint(QPainter *painter, QStyleOptionViewItem
   if (headerheight > 0)
   {
     painter->setFont(d_groupheaderfont);
-    painter->setPen(QColor("white"));
+    painter->setPen(message_deleted ? QColor("black") : QColor("white"));
     // painter->drawRect(d_pointerwidth + offset + d_leftpadding, d_headerpadding, contentswidth, headerheight - d_headerpadding);
     painter->drawText(d_pointerwidth + offset + d_leftpadding, d_headerpadding, contentswidth, headerheight - d_headerpadding, Qt::AlignLeft,
                       RecipientPreferences::getName(index.data(bepaald::RecipientIdRole).toString()));

@@ -118,7 +118,7 @@ bool ConversationSqlModel::setConversation(QString const &thread_id, bool isgrou
     "FROM '" + ColumnNames::d_mms_table + "' WHERE " + thread_id + " = " + ColumnNames::d_mms_table + ".thread_id "
     "ORDER BY union_date ASC, union_display_date DESC";
 
-  qDebug() << query;
+  //qDebug() << query;
 
   QString pq = "SELECT " +
     ColumnNames::d_part_table + "._id, " +
@@ -342,6 +342,21 @@ void ConversationSqlModel::setQueryWorker(QSqlDatabase db, QString const &mainqu
       }
     }
 
+    if (q.value(MMS_ID).isValid() && !q.value(MMS_ID).toString().isEmpty() &&
+        ColumnNames::d_tables.contains("mention"))
+    {
+      QSqlQuery mentionquery(db);
+      if (!mentionquery.exec("SELECT recipient_id, range_start, range_length FROM mention WHERE message_id = " + q.value(MMS_ID).toString()))
+        qDebug() << mentionquery.lastError().text();
+      else
+      {
+        std::vector<bepaald::Mention> msg_mentions;
+        while (mentionquery.next())
+          msg_mentions.emplace_back(bepaald::Mention{mentionquery.value(0).toInt(), mentionquery.value(1).toInt(), mentionquery.value(2).toInt(), false /*isquote*/});
+        item->setData(QVariant::fromValue<std::vector<bepaald::Mention>>(msg_mentions), bepaald::MentionRole);
+      }
+    }
+
     // save attachment info, but dont parse it
 
     // remove this, just switch over to separate things...
@@ -358,9 +373,10 @@ void ConversationSqlModel::setQueryWorker(QSqlDatabase db, QString const &mainqu
 
     //item->setData(true, bepaald::ItemCompleteRole);
 
-    //appendRow(item);
+    //appendRow(item)
 
-    if (extraitem)
+
+     if (extraitem)
       emit itemAvailable(extraitem);
     emit itemAvailable(item);
   }

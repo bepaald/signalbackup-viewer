@@ -64,6 +64,14 @@ namespace bepaald
     QString extension;
   };
 
+  struct Mention
+  {
+    int recipient_id;
+    int range_start;
+    int range_length;
+    bool isquote;
+  };
+
   enum MSGDIRECTION : int
   {
    INCOMING,
@@ -91,6 +99,7 @@ namespace bepaald
    ItemCompleteRole, // this can go?
    MsgDeletedRole,
    MsgRangesRole,
+   MentionRole,
 
    // thread selection
    AvatarRole,

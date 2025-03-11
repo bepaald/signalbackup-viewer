@@ -19,6 +19,8 @@
 
 #include "columnnames.ih"
 
+QStringList ColumnNames::d_tables;
+
 QSqlRecord ColumnNames::d_recipient_record;
 QSqlRecord ColumnNames::d_sms_record;
 QSqlRecord ColumnNames::d_message_record;

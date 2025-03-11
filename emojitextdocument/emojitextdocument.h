@@ -29,6 +29,8 @@
 #include <unordered_set>
 
 #include "../shared/msgrange.h"
+#include "../common_fe.h"
+#include "../recipientpreferences/recipientpreferences.h"
 
 using std::literals::string_literals::operator""s;
 
@@ -41,7 +43,8 @@ class EmojiTextDocument : public QTextDocument
   static unsigned int constexpr s_emoji_min_size = 2;
  public:
   inline EmojiTextDocument() = default;
-  inline void setHtml(std::string const &str, QByteArray const &ranges = QByteArray());
+  inline void setHtml(std::string const &str, QByteArray const &ranges = QByteArray(),
+                      QVariant const &mentions = QVariant());
 
  private:
   std::vector<std::pair<unsigned int, unsigned int>> getEmojiPos(std::string const &str) const;
@@ -139,7 +142,7 @@ inline void EmojiTextDocument::HTMLescapeString(std::string *body, std::set<int>
 }
 
 
-inline void EmojiTextDocument::setHtml(std::string const &str, QByteArray const &msgrange)
+inline void EmojiTextDocument::setHtml(std::string const &str, QByteArray const &msgrange, QVariant const &mentions)
 {
   clear();
 
@@ -150,21 +153,25 @@ inline void EmojiTextDocument::setHtml(std::string const &str, QByteArray const 
   std::string body(str);
 
   std::vector<Range> ranges;
-  /*
+
   // first, add mentions...
-  for (auto const &m : mentions)
+  if (mentions.isValid())
   {
-  // m1 : uuid, m2: start, m3: length
-  if (!author.empty())
-  {
-  ranges.emplace_back(Range{std::get<1>(m), std::get<2>(m),
-  (isquote ? "" : "<b>"),
-  "@" + std::get<4>(m),
-  (isquote ? "" : "</b>"),
-  true});
+    std::vector<bepaald::Mention> const &mentionsv = mentions.value<std::vector<bepaald::Mention>>();
+    for (auto const &m : mentionsv)
+    {
+      std::string author = RecipientPreferences::getName(QString::number(m.recipient_id)).toStdString();
+      // m1 : uuid, m2: start, m3: length
+      if (!author.empty())
+      {
+        ranges.emplace_back(Range{m.range_start, m.range_length,
+                                  (m.isquote ? "" : "<b>"),
+                                  "@" + author,
+                                  (m.isquote ? "" : "</b>"),
+                                  true});
+      }
+    }
   }
-  }
-  */
 
   // now do other stylings?
   bool hasstyledlinks = false;
