@@ -127,7 +127,7 @@ QString ConversationListViewDelegate::getStatusMessage(QModelIndex const &index)
   }
   else
   {
-    qDebug() << "     !!!!     WARNING   UNHANDLED STATUS MESSAGE";
+    //qDebug() << "     !!!!     WARNING   UNHANDLED STATUS MESSAGE";
     return "(unhandled status message)";
   }
 }

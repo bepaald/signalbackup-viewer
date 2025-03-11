@@ -33,7 +33,7 @@ The look is based on the way Signal looked back then. This means speech bubbles 
 
 There is a long list of features this viewer does not yet support. Many of them simply did not exist when I last touched this code.
 - I was apparently midway implementing quotes, when I stopped working on this: they half-appear.
-- chat folders, emoji reactions, message-editing, message-styling, mentions, stories: none of these existed back then and none are supported.
+- chat folders, emoji reactions, message-editing, ~~message-styling,~~ mentions, stories: none of these existed back then and none are supported.
 - There is currently no way of playing video-media (audio should play back), or enlarging images. Also no saving yet.
 - Many status messages are not implemented.
 - Expect a _lot_ of debugging messages output to terminal while running.

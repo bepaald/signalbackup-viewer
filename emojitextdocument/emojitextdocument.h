@@ -20,6 +20,7 @@
 #ifndef EMOJITEXTDOCUMENT_H_
 #define EMOJITEXTDOCUMENT_H_
 
+#include <QByteArray>
 #include <QTextDocument>
 #include <QTextCursor>
 #include <QString>
@@ -40,12 +41,17 @@ class EmojiTextDocument : public QTextDocument
   static unsigned int constexpr s_emoji_min_size = 2;
  public:
   inline EmojiTextDocument() = default;
-  inline void setHtml(std::string const &str/*, std::vector<Mention> const &mentions*/);
+  inline void setHtml(std::string const &str, QByteArray const &ranges = QByteArray());
 
  private:
   std::vector<std::pair<unsigned int, unsigned int>> getEmojiPos(std::string const &str) const;
   inline std::string HTMLescapeString(std::string const &body) const;
   void HTMLescapeString(std::string *body, std::set<int> const *const positions_excluded_from_escape = nullptr) const;
+  void applyRanges(std::string *body, std::vector<Range> *ranges, std::set<int> *positions_excluded_from_escape) const;
+  void prepRanges(std::vector<Range> *ranges) const;
+  inline int bytesToUtf8CharSize(std::string const &body, int idx) const;
+  inline int utf16CharSize(std::string const &body, int idx) const;
+  inline int numBytesInUtf16Substring(std::string const &text, unsigned int idx, int length) const;
 };
 
 inline std::string EmojiTextDocument::HTMLescapeString(std::string const &body) const
@@ -133,7 +139,7 @@ inline void EmojiTextDocument::HTMLescapeString(std::string *body, std::set<int>
 }
 
 
-inline void EmojiTextDocument::setHtml(std::string const &str)
+inline void EmojiTextDocument::setHtml(std::string const &str, QByteArray const &msgrange)
 {
   clear();
 
@@ -144,9 +150,8 @@ inline void EmojiTextDocument::setHtml(std::string const &str)
   std::string body(str);
 
   std::vector<Range> ranges;
-
   /*
-  // first, do mentions...
+  // first, add mentions...
   for (auto const &m : mentions)
   {
   // m1 : uuid, m2: start, m3: length
@@ -161,87 +166,90 @@ inline void EmojiTextDocument::setHtml(std::string const &str)
   }
   */
 
-  /*
   // now do other stylings?
   bool hasstyledlinks = false;
-  if (brdata.second)
+  if (!msgrange.isEmpty())
   {
-  BodyRanges brsproto(brdata);
-  //brsproto.print();
+    BodyRanges brsproto(reinterpret_cast<unsigned char const *>(msgrange.constData()), msgrange.size());
 
-  auto brs = brsproto.getField<1>();
-  for (auto const &br : brs)
-  {
-  int start = br.getField<1>().value_or(0);
-  int length = br.getField<2>().value_or(0);
-  if (!length) // maybe legal? no length == rest of string? (like no start is beg)
-  continue;
+    //qInfo() << "printing rangedata";
+    //brsproto.print();
 
-  // get mention
-  std::string mentionuuid = br.getField<3>().value_or(std::string());
-  if (!mentionuuid.empty())
-  {
-  long long int authorid = getRecipientIdFromUuidMapped(mentionuuid, nullptr);
-  std::string author = getRecipientInfoFromMap(recipient_info, authorid).display_name;
-  if (!author.empty())
-  ranges.emplace_back(Range{start, length,
-  (isquote ? "" : "<span class=\"mention-"s + (incoming ? "in" : "out") + "\">"),
-  "@" + author,
-  (isquote ? "" : "</span>"),
-  true});
+    auto brs = brsproto.getField<1>();
+    for (auto const &br : brs)
+    {
+      int start = br.getField<1>().value_or(0);
+      int length = br.getField<2>().value_or(0);
+      if (!length) // maybe legal? no length == rest of string? (like no start is beg)
+        continue;
+
+      /*
+      // get mention
+      std::string mentionuuid = br.getField<3>().value_or(std::string());
+      if (!mentionuuid.empty())
+      {
+        long long int authorid = getRecipientIdFromUuidMapped(mentionuuid, nullptr);
+        std::string author = getRecipientInfoFromMap(recipient_info, authorid).display_name;
+        if (!author.empty())
+          ranges.emplace_back(Range{start, length,
+                                    (isquote ? "" : "<span class=\"mention-"s + (incoming ? "in" : "out") + "\">"),
+                                    "@" + author,
+                                    (isquote ? "" : "</span>"),
+                                    true});
+      }
+      */
+
+      // get style
+      int style = br.getField<4>().value_or(-1);
+
+      // get link
+      std::string link = br.getField<5>().value_or(std::string());
+
+      if (style > -1)
+      {
+        //std::cout << "Adding style to range [" << start << "-" << start+length << "] : " << style << std::endl;
+        switch (style)
+        {
+          case 0: // BOLD
+          {
+            ranges.emplace_back(Range{start, length, "<b>", "", "</b>", false});
+            break;
+          }
+          case 1: // ITALIC
+          {
+            ranges.emplace_back(Range{start, length, "<i>", "", "</i>", false});
+            break;
+          }
+          case 2: // SPOILER
+          {
+            ranges.emplace_back(Range{start, length, "<span class=\"spoiler\">", "", "</span>", true});
+            break;
+          }
+          case 3: // STRIKETHROUGH
+          {
+            ranges.emplace_back(Range{start, length, "<s>", "", "</s>", false}); // or <del>? or <span class="strikthrough">?
+            break;
+          }
+          case 4: // MONOSPACE
+          {
+            ranges.emplace_back(Range{start, length, "<span class=\"monospace\">", "", "</span>", false});
+            break;
+          }
+          default:
+          {
+            Logger::warning("Unsupported range-style: ", style);
+          }
+        }
+      }
+      if (!link.empty())
+      {
+        //std::cout << "Adding link to range [" << start << "-" << start+length << "] '" << link << "'" << std::endl;
+        ranges.emplace_back(Range{start, length, "<a class=\"styled-link\" href=\"" + link + "\">", "", "</a>", true});
+        hasstyledlinks = true;
+      }
+    }
   }
 
-  // get style
-  int style = br.getField<4>().value_or(-1);
-
-  // get link
-  std::string link = br.getField<5>().value_or(std::string());
-
-  if (style > -1)
-  {
-  //std::cout << "Adding style to range [" << start << "-" << start+length << "] : " << style << std::endl;
-  switch (style)
-  {
-  case 0: // BOLD
-  {
-  ranges.emplace_back(Range{start, length, "<b>", "", "</b>", false});
-  break;
-  }
-  case 1: // ITALIC
-  {
-  ranges.emplace_back(Range{start, length, "<i>", "", "</i>", false});
-  break;
-  }
-  case 2: // SPOILER
-  {
-  ranges.emplace_back(Range{start, length, "<span class=\"spoiler\">", "", "</span>", true});
-  break;
-  }
-  case 3: // STRIKETHROUGH
-  {
-  ranges.emplace_back(Range{start, length, "<s>", "", "</s>", false}); // or <del>? or <span class="strikthrough">?
-  break;
-  }
-  case 4: // MONOSPACE
-  {
-  ranges.emplace_back(Range{start, length, "<span class=\"monospace\">", "", "</span>", false});
-  break;
-  }
-  default:
-  {
-  Logger::warning("Unsupported range-style: ", style);
-  }
-  }
-  }
-  if (!link.empty())
-  {
-  //std::cout << "Adding link to range [" << start << "-" << start+length << "] '" << link << "'" << std::endl;
-  ranges.emplace_back(Range{start, length, "<a class=\"styled-link\" href=\"" + link + "\">", "", "</a>", true});
-  hasstyledlinks = true;
-  }
-  }
-  }
-  */
 
   /*
   // scan for links (somehow skipping the styled links above!), then
@@ -252,7 +260,7 @@ inline void EmojiTextDocument::setHtml(std::string const &str)
 
   // apply...
   std::set<int> positions_excluded_from_escape;
-  //applyRanges(body, &ranges, &positions_excluded_from_escape);
+  applyRanges(&body, &ranges, &positions_excluded_from_escape);
 
   //qInfo() << body;
   HTMLescapeString(&body, &positions_excluded_from_escape);
@@ -300,6 +308,67 @@ inline void EmojiTextDocument::setHtml(std::string const &str)
   //QTextCursor cursor(this);
   //cursor.insertText(QString::fromStdString(body));
   QTextDocument::setHtml(QString::fromStdString(body));
+}
+
+inline int EmojiTextDocument::bytesToUtf8CharSize(std::string const &body, int idx) const
+{
+  if ((static_cast<uint8_t>(body[idx]) & 0b10000000) == 0b00000000)
+    return 1;
+  else if ((static_cast<uint8_t>(body[idx]) & 0b11100000) == 0b11000000) // 2 byte char
+    return 2;
+  else if ((static_cast<uint8_t>(body[idx]) & 0b11110000) == 0b11100000) // 3 byte char
+    return 3;
+  else if ((static_cast<uint8_t>(body[idx]) & 0b11111000) == 0b11110000) // 4 byte char
+    return 4;
+  else
+    return 1;
+}
+
+inline int EmojiTextDocument::utf16CharSize(std::string const &body, int idx) const
+{
+  // get code point
+  uint32_t codepoint = 0;
+  if ((static_cast<uint8_t>(body[idx]) & 0b11111000) == 0b11110000) // 4 byte char
+    /*
+    codepoint =
+      (static_cast<uint8_t>(body[idx]) & 0b00000111) << 18 |
+      (static_cast<uint8_t>(body[idx + 1]) & 0b00111111) << 12 |
+      (static_cast<uint8_t>(body[idx + 2]) & 0b00111111) << 6 |
+      (static_cast<uint8_t>(body[idx + 3]) & 0b00111111);
+    */
+    return 2; // all 4 byte utf8 chars are 2 bytes in utf16
+  else if ((static_cast<uint8_t>(body[idx]) & 0b11110000) == 0b11100000) // 3 byte char
+    codepoint =
+      (static_cast<uint8_t>(body[idx]) & 0b00001111) << 12 |
+      (static_cast<uint8_t>(body[idx + 1]) & 0b00111111) << 6 |
+      (static_cast<uint8_t>(body[idx + 2]) & 0b00111111);
+  /*
+  else if ((static_cast<uint8_t>(body[idx]) & 0b11100000) == 0b11000000) // 2 byte char
+    codepoint =
+      (static_cast<uint8_t>(body[idx]) & 0b00011111) << 6 |
+      (static_cast<uint8_t>(body[idx + 1]) & 0b00111111);
+  else
+    codepoint = static_cast<uint8_t>(body[idx]);
+  */
+  else // all 1 and two byte utf-8 chars are 1 utf-16 char (max is 0b11111111111 which < 0x10000)
+    return 1;
+
+  return codepoint >= 0x10000 ? 2 : 1;
+}
+
+inline int EmojiTextDocument::numBytesInUtf16Substring(std::string const &text, unsigned int idx, int length) const
+{
+  int utf16count = 0;
+  int bytecount = 0;
+
+  while (utf16count < length && idx < text.size())
+  {
+    utf16count += utf16CharSize(text, idx);
+    int utf8size = bytesToUtf8CharSize(text, idx);
+    bytecount += utf8size;
+    idx += utf8size;
+  }
+  return bytecount;
 }
 
 #endif

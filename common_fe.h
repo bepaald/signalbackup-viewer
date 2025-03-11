@@ -90,6 +90,7 @@ namespace bepaald
    SmsIdRole,
    ItemCompleteRole, // this can go?
    MsgDeletedRole,
+   MsgRangesRole,
 
    // thread selection
    AvatarRole,

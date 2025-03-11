@@ -133,6 +133,7 @@ SOURCES += main.cc \
            conversationsqlmodel/workerthread.cc \
            emojitextdocument/getemojipos.cc \
            emojitextdocument/statics_emoji.cc \
+           emojitextdocument/applyranges.cc \
            mediaplayer/mediaplayer.cc \
            mediapreviewgenerator/getrgb.cc \
            mediapreviewgenerator/mediapreviewgenerator.cc \

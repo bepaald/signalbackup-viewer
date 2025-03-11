@@ -82,6 +82,9 @@ bool ConversationSqlModel::setConversation(QString const &thread_id, bool isgrou
         "'' AS [mms.quote_author], "
         "'' AS [mms.quote_body], "
         "'' AS [mms.quote_missing] ";
+    if (ColumnNames::d_message_record.contains(ColumnNames::d_mms_table + "." + ColumnNames::d_mms_ranges))
+      query += ","
+        "'' AS [mms.ranges] ";
     if (ColumnNames::d_message_record.contains(ColumnNames::d_mms_table + ".remote_deleted"))
       query += ","
         "'' AS [mms.deleted] ";
@@ -105,6 +108,9 @@ bool ConversationSqlModel::setConversation(QString const &thread_id, bool isgrou
       ColumnNames::d_mms_table + ".quote_author AS [mms.quote_author], " +
       ColumnNames::d_mms_table + ".quote_body AS [mms.quote_body], " +
       ColumnNames::d_mms_table + ".quote_missing AS [mms.quote_missing] ";
+  if (ColumnNames::d_message_record.contains(ColumnNames::d_mms_table + "." + ColumnNames::d_mms_ranges))
+    query += "," +
+      ColumnNames::d_mms_table + "." + ColumnNames::d_mms_ranges + " AS [mms.ranges] ";
   if (ColumnNames::d_message_record.contains(ColumnNames::d_mms_table + ".remote_deleted"))
     query += "," +
       ColumnNames::d_mms_table + ".remote_deleted AS [mms.deleted] ";
@@ -250,10 +256,10 @@ void ConversationSqlModel::setQueryWorker(QSqlDatabase db, QString const &mainqu
     }
 
     // set mms id
-    item->setData(QVariant::fromValue(q.value(MMS_ID).toULongLong()), bepaald::MmsIdRole);
+    item->setData(q.value(MMS_ID), bepaald::MmsIdRole);
 
     // set sms id
-    item->setData(QVariant::fromValue(q.value(SMS_ID).toULongLong()), bepaald::SmsIdRole);
+    item->setData(q.value(SMS_ID), bepaald::SmsIdRole);
 
     // set recipient id
     item->setData(QVariant::fromValue(q.value(UNION_ADDRESS).toString()), bepaald::RecipientIdRole);
@@ -274,13 +280,17 @@ void ConversationSqlModel::setQueryWorker(QSqlDatabase db, QString const &mainqu
     //item->setData(QVariant::fromValue(msgbody), Qt::DisplayRole);
 
     // set message body
-    item->setData(q.value(UNION_BODY).toString(), Qt::DisplayRole);
+    item->setData(q.value(UNION_BODY), Qt::DisplayRole);
 
     // set isdeleted
     if (ColumnNames::d_message_record.contains(ColumnNames::d_mms_table + ".remote_deleted"))
       item->setData(QVariant::fromValue(q.value("mms.deleted").toBool()), bepaald::MsgDeletedRole);
     else
       item->setData(QVariant::fromValue(false), bepaald::MsgDeletedRole);
+
+    // set ranges (text styling)
+    if (ColumnNames::d_message_record.contains(ColumnNames::d_mms_table + "." + ColumnNames::d_mms_ranges))
+      item->setData(q.value("mms.ranges"), bepaald::MsgRangesRole);
 
     // date time
     item->setData(QVariant::fromValue(QDateTime::fromMSecsSinceEpoch(q.value(UNION_DISPLAY_DATE).toULongLong()).toString("yyyy-MM-dd HH:mm:ss")), bepaald::DateTimeRole);

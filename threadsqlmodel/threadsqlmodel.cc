@@ -57,7 +57,7 @@ void ThreadSqlModel::setQuery(QString const &query)
   }
   while (q.next())
   {
-    qInfo() << "Got: " << q.record();
+    //qInfo() << "Got: " << q.record();
 
     // get id, up to dbv 23 == "+316...", after 23 == "num"
     QString id = q.value(ColumnNames::d_thread_recipient_id).toString(); // upto dbv 23 == "+316...", after 23 == "num"

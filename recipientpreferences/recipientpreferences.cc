@@ -86,7 +86,7 @@ void RecipientPreferences::loadData()
   }
   while (recipientsquery.next())
   {
-    qInfo() << "Got: " << recipientsquery.record();
+    //qInfo() << "Got: " << recipientsquery.record();
 
     QString id = s_databaseversion >= 24 ? recipientsquery.value("_id").toString() : recipientsquery.value("recipient_ids").toString();
     QString name = "";
@@ -150,8 +150,8 @@ void RecipientPreferences::loadData()
       }
 
 
-      for (auto it = s_avatars->begin(); it != s_avatars->end(); ++it)
-        qInfo() << QString::fromStdString(it->first);
+      //for (auto it = s_avatars->begin(); it != s_avatars->end(); ++it)
+      //  qInfo() << QString::fromStdString(it->first);
 
       if (s_databaseversion >= 33) // both avatar's and everything else in db is referenced by recipient._id
       {
@@ -177,7 +177,7 @@ void RecipientPreferences::loadData()
       }
     }
 
-    qInfo() << "PREFDATA NEW" << id << name << color << /*darkcolor << */avatar.size();
+    //qInfo() << "PREFDATA NEW" << id << name << color << /*darkcolor << */avatar.size();
     add(id, {name, color, darkcolor, isgroup, avatar});
 
   }

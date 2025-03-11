@@ -20,6 +20,8 @@
 #ifndef MSGRANGE_H_
 #define MSGRANGE_H_
 
+#include "protobufparser/protobufparser.h"
+
 // data that defines ranges in a message body to be replaced for html output
 struct Range
 {
@@ -40,5 +42,16 @@ struct Range
 
   };
 };
+
+typedef ProtoBufParser<protobuffer::optional::INT32, // int32 start
+                       protobuffer::optional::INT32, // int32 length
+                       protobuffer::optional::STRING,                   // \.
+                       protobuffer::optional::ENUM,                     //  \.
+                       protobuffer::optional::STRING,                   //   > ONE OF
+                       ProtoBufParser<protobuffer::optional::STRING,    //  /
+                                      protobuffer::optional::STRING>>   // /
+BodyRange;
+
+typedef ProtoBufParser<std::vector<BodyRange>> BodyRanges;
 
 #endif

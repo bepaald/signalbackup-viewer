@@ -185,9 +185,9 @@ void ConversationListViewDelegate::paint(QPainter *painter, QStyleOptionViewItem
   //bodydoc.setDocumentMargin(documentmargin);
   bodydoc.setDefaultTextOption(textOption);
   bodydoc.setDefaultFont(d_bodyfont);
-  bodydoc.setDefaultStyleSheet(".emoji {font-size: " + QString::number(QFontMetrics(d_bodyfont).height() + 4) + "px; font-family: emoji;} .jumbo-emoji {font-size: " + QString::number((QFontMetrics(d_bodyfont).height() + 4) * 3) + "px; font-family: emoji;}");
+  bodydoc.setDefaultStyleSheet(".emoji {font-size: " + QString::number(QFontMetrics(d_bodyfont).height() + 4) + "px; font-family: emoji;} .jumbo-emoji {font-size: " + QString::number((QFontMetrics(d_bodyfont).height() + 4) * 3) + "px; font-family: emoji;} .monospace {font-family: 'Roboto Mono';}");
   QString bodytext(message_deleted ? (outgoing ? "You deleted this message." : "This message was deleted.") : index.data(Qt::DisplayRole).toString());
-  bodydoc.setHtml(bodytext.toStdString());
+  bodydoc.setHtml(bodytext.toStdString(), index.data(bepaald::MsgRangesRole).toByteArray());
 
   qreal contentswidth = option.rect.width() * d_widthfraction - d_horizontalmargin - d_pointerwidth - d_leftpadding - d_rightpadding;
   if (!outgoing && index.data(bepaald::IsGroupThreadRole).toBool())
@@ -557,7 +557,7 @@ void ConversationListViewDelegate::paint(QPainter *painter, QStyleOptionViewItem
   }
 
   // outline message_deleted /* or selected*/
-  if (message_deleted /*|| (option.state & QStyle::State_Selected)*/)
+  if (message_deleted /*|| (option.state & QStyle::State_Selected)*/) [[unlikely]]
   {
     painter->setPen(QColor("black"));
     painter->drawPath(pointie);
@@ -566,11 +566,10 @@ void ConversationListViewDelegate::paint(QPainter *painter, QStyleOptionViewItem
   {
     painter->setPen(QPen(bgcolor));
     painter->drawPath(pointie);
+    painter->fillPath(pointie, QBrush(bgcolor));
+    painter->setPen(QColor("#CCCCCC"));
+    painter->drawPath(shadow);
   }
-
-  painter->fillPath(pointie, QBrush(bgcolor));
-  painter->setPen(QColor("#CCCCCC"));
-  painter->drawPath(shadow);
 
   if (outgoing) // rotate back or painter is going to paint the text rotated...
   {
@@ -593,7 +592,7 @@ void ConversationListViewDelegate::paint(QPainter *painter, QStyleOptionViewItem
   QAbstractTextDocumentLayout::PaintContext ctx;
 
   // set text color
-  if (bgcolor != QColor("#FFFFFF"))
+  if (bgcolor != QColor("#FFFFFF") && !message_deleted)
     ctx.palette.setColor(QPalette::Text, QColor("white"));
   else
     ctx.palette.setColor(QPalette::Text, QColor("black"));
@@ -875,7 +874,7 @@ void ConversationListViewDelegate::paint(QPainter *painter, QStyleOptionViewItem
 
   // draw footer (date/time + reception stat)
   painter->setFont(d_footerfont);
-  painter->setPen(QColor(outgoing ? "black" : "white"));
+  painter->setPen(QColor(outgoing || message_deleted ? "black" : "white"));
   if (outgoing && /*[[unlikely]]*/
       ((index.data(bepaald::MsgTypeRole).toULongLong() & Types::BASE_TYPE_MASK) == Types::BASE_OUTBOX_TYPE ||
        (index.data(bepaald::MsgTypeRole).toULongLong() & Types::BASE_TYPE_MASK) == Types::BASE_SENDING_TYPE))
